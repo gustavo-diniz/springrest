@@ -4,13 +4,16 @@ package br.com.gustavodiniz.rest.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.gustavodiniz.rest.to.RestTO;
 import br.com.gustavodiniz.rest.to.UserTO;
@@ -28,7 +31,7 @@ public class SpringRestController {
 		return new ResponseEntity<List<RestTO>>(lista, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/usuarios", method = RequestMethod.GET)
+	@RequestMapping(value = "/usuario", method = RequestMethod.GET)
 	public ResponseEntity<List<UserTO>> listarUsuarios(){
 		
 		List<UserTO> lista = new ArrayList<UserTO>();
@@ -37,7 +40,7 @@ public class SpringRestController {
 		return new ResponseEntity<List<UserTO>>(lista, HttpStatus.OK);
 	}
 	
-	@RequestMapping(value = "/usuarios/{nome}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+	@RequestMapping(value = "/usuario/{nome}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserTO> buscarUsuario(@PathVariable("nome") String nome){
 		
 		System.out.println("Buscando usuário por: " + nome);
@@ -64,5 +67,19 @@ public class SpringRestController {
 		return new ResponseEntity<UserTO>(to, HttpStatus.OK);
 	}
 	
+	
+	//-------------------Criar um usuario --------------------------------------------------------
+    
+    @RequestMapping(value = "/incluir", method = RequestMethod.POST)
+    public ResponseEntity<Void> criarUsuario(@RequestBody UserTO user, UriComponentsBuilder ucBuilder) {
+        System.out.println("Criando Usuario " + user.getNome());
+ 
+        // sua regra de negocio
+        // em caso de conflito ou erro, voce pode usar o HttpStatus.CONFLICT
+        
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(ucBuilder.path("/usuario/{id}").buildAndExpand(user.getNome()).toUri());
+        return new ResponseEntity<Void>(headers, HttpStatus.CREATED);
+    }
 	
 }
